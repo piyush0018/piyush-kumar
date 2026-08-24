@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Admin Portal & Visual Database Engine | Piyush Kumar</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Admin Stylesheet -->
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- Ambient Glow Effects -->
+  <div class="admin-glow glow-1"></div>
+  <div class="admin-glow glow-2"></div>
+
+  <!-- ==========================================================================
+       LOGIN GATEWAY (Passcode Authentication)
+       ========================================================================== -->
+  <div class="login-gateway" id="login-gateway">
+    <div class="login-card">
+      <div class="login-icon-box">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h2 style="font-family: var(--font-display); font-size: 1.6rem; margin-bottom: 0.4rem; color: #fff;">
+        Admin Authentication
+      </h2>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.8rem;">
+        Enter your administrative passcode to manage portfolio database & content.
+      </p>
+
+      <form id="admin-login-form">
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label">Admin Passcode</label>
+          <div style="position: relative;">
+            <input type="password" id="admin-passcode-input" class="form-input" placeholder="Default: admin123" required autofocus style="padding-right: 2.8rem;">
+            <button type="button" id="toggle-pass-visibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-dim); cursor: pointer;">
+              <i class="fa-regular fa-eye" id="pass-eye-icon"></i>
+            </button>
+          </div>
+          <div id="login-error-msg" style="color: var(--danger-primary); font-size: 0.8rem; margin-top: 0.4rem; display: none;">
+            <i class="fa-solid fa-circle-exclamation"></i> Incorrect passcode. Default is <code>admin123</code>.
+          </div>
+        </div>
+
+        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center; margin-top: 1rem; padding: 0.75rem;">
+          <i class="fa-solid fa-lock-open"></i> Unlock Control Center
+        </button>
+      </form>
+
+      <div style="margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-dim);">
+        <a href="index.html" style="color: var(--gold-primary); text-decoration: none;">
+          <i class="fa-solid fa-arrow-left"></i> Return to Live Portfolio
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MAIN ADMIN PORTAL INTERFACE
+       ========================================================================== -->
+  <div class="admin-wrapper" id="admin-app" style="display: none;">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">PK</div>
+        <div class="sidebar-logo-text">
+          Piyush Kumar <span>Control</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Overview</div>
+        <a class="admin-nav-item active" data-view="dashboard">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="admin-nav-item" data-view="database">
+          <i class="fa-solid fa-database"></i>
+          <span>Visual Database</span>
+        </a>
+
+        <div class="nav-section-title">Content Management</div>
+        <a class="admin-nav-item" data-view="profile">
+          <i class="fa-solid fa-user-astronaut"></i>
+          <span>Profile & Hero</span>
+        </a>
+        <a class="admin-nav-item" data-view="experience">
+          <i class="fa-solid fa-briefcase"></i>
+          <span>Experience</span>
+        </a>
+        <a class="admin-nav-item" data-view="projects">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Projects & Demos</span>
+        </a>
+        <a class="admin-nav-item" data-view="research">
+          <i class="fa-solid fa-book-journal-whills"></i>
+          <span>Research Papers</span>
+        </a>
+        <a class="admin-nav-item" data-view="certifications">
+          <i class="fa-solid fa-award"></i>
+          <span>Certifications</span>
+        </a>
+        <a class="admin-nav-item" data-view="skills">
+          <i class="fa-solid fa-code"></i>
+          <span>Skills Matrix</span>
+        </a>
+
+        <div class="nav-section-title">Communications & Config</div>
+        <a class="admin-nav-item" data-view="messages">
+          <i class="fa-solid fa-inbox"></i>
+          <span>Inbox Inquiries</span>
+          <span class="nav-badge" id="sidebar-inbox-badge">0</span>
+        </a>
+        <a class="admin-nav-item" data-view="settings">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings & Backup</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-user-info">
+          <img src="assets/images/avatar.jpg" alt="Admin" class="admin-avatar-mini" id="sidebar-avatar-img">
+          <div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #fff;" id="sidebar-admin-name">Piyush Kumar</div>
+            <div style="font-size: 0.72rem; color: var(--gold-light);">Super Administrator</div>
+          </div>
+        </div>
+        <button class="btn-icon-admin" id="sidebar-logout-btn" title="Logout">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Container -->
+    <main class="admin-main">
+      
+      <!-- Top Navigation Bar -->
+      <header class="admin-header">
+        <div class="header-left">
+          <button class="btn-icon-admin" id="mobile-sidebar-toggle" style="display: none;">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <h1 class="page-title" id="admin-current-page-title">Dashboard Overview</h1>
+          <div class="db-status-pill">
+            <span class="db-status-dot"></span>
+            <span>PortfolioDB: Connected</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <a href="index.html" target="_blank" class="btn-admin btn-admin-secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Portfolio
+          </a>
+          <button class="btn-admin btn-admin-primary" id="header-quick-save-btn">
+            <i class="fa-solid fa-floppy-disk"></i> Quick Save
+          </button>
+          <button class="btn-admin btn-admin-danger" id="header-logout-btn">
+            <i class="fa-solid fa-lock"></i> Lock
+          </button>
+        </div>
+      </header>
+
+      <!-- View Containers -->
+      <div class="admin-content">
+
+        <!-- ==================================================================
+             VIEW 1: DASHBOARD OVERVIEW
+             ================================================================== -->
+        <section class="admin-view active" id="view-dashboard">
+          
+          <!-- Metric Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Active Projects</span>
+                <div class="stat-card-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--cyan-light);">
+                  <i class="fa-solid fa-cubes"></i>
+                </div>
+              </div>
+              <div class="stat-val" id="dash-projects-count">4</div>
+              <div class="stat-subtext">Featured systems with live simulators</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Accreditations</span>
+                <div class="stat-card-icon" style="background: rgba(212, 175, 55, 0.15); color: var(--gold-light);">
+                  <i class="fa-solid fa-certificate"></i>
+                </div>
+              </div>
+              <div class="stat-val" id="dash-certs-count">7</div>
+              <div class="stat-subtext">NVIDIA, Google, Oracle & Cloud</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Work Experience</span>
+                <div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald-light);">
+                  <i class="fa-solid fa-briefcase"></i>
+                </div>
+              </div>
+              <div class="stat-val" id="dash-exp-count">2</div>
+              <div class="stat-subtext">Industry internships logged</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Inbox Messages</span>
+                <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.15); color: var(--danger-light);">
+                  <i class="fa-solid fa-envelope-open-text"></i>
+                </div>
+              </div>
+              <div class="stat-val" id="dash-msgs-count">1</div>
+              <div class="stat-subtext" id="dash-unread-subtext">0 unread inquiries</div>
+            </div>
+          </div>
+
+          <!-- Quick Navigation Cards Grid -->
+          <div class="form-grid" style="margin-bottom: 2rem;">
+            <div class="admin-card" style="margin-bottom: 0;">
+              <div class="card-title-heading" style="margin-bottom: 1rem;">
+                <i class="fa-solid fa-bolt"></i> Quick Content Actions
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+                <button class="btn-admin btn-admin-secondary" onclick="switchAdminView('profile')">
+                  <i class="fa-solid fa-user-pen"></i> Edit Hero Bio & Profile Details
+                </button>
+                <button class="btn-admin btn-admin-secondary" onclick="switchAdminView('projects')">
+                  <i class="fa-solid fa-plus"></i> Add or Modify Portfolio Project
+                </button>
+                <button class="btn-admin btn-admin-secondary" onclick="switchAdminView('database')">
+                  <i class="fa-solid fa-table-columns"></i> Open Visual Database Explorer
+                </button>
+                <button class="btn-admin btn-admin-secondary" onclick="switchAdminView('messages')">
+                  <i class="fa-solid fa-inbox"></i> View Inquiries & Form Transmissions
+                </button>
+              </div>
+            </div>
+
+            <div class="admin-card" style="margin-bottom: 0;">
+              <div class="card-title-heading" style="margin-bottom: 1rem;">
+                <i class="fa-solid fa-server"></i> System Health & Storage
+              </div>
+              <div style="font-size: 0.88rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Database Engine:</span>
+                  <strong style="color: var(--emerald-light);">PortfolioDB (LocalStorage + Sync)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Stored Collections:</span>
+                  <strong style="color: #fff;">8 Tables (Profile, Projects, etc.)</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Storage Footprint:</span>
+                  <strong style="color: var(--cyan-light);" id="dash-db-size">~18 KB</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span>Last Sync / Backup:</span>
+                  <strong style="color: var(--gold-light);" id="dash-last-sync">Just now</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Inquiries Preview Table -->
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-comments"></i> Recent Contact Submissions
+              </div>
+              <button class="btn-admin btn-admin-secondary btn-sm" onclick="switchAdminView('messages')">
+                View All Inquiries
+              </button>
+            </div>
+            <div class="data-table-container">
+              <table class="admin-data-table" id="dash-recent-messages-table">
+                <thead>
+                  <tr>
+                    <th>Sender</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================================================================
+             VIEW 2: VISUAL DATABASE EXPLORER & JSON ENGINE
+             ================================================================== -->
+        <section class="admin-view" id="view-database">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div>
+                <div class="card-title-heading">
+                  <i class="fa-solid fa-database"></i> Visual Database Management Console
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+                  Directly inspect, query, edit, insert, export, and manage raw JSON collections in real-time.
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                <button class="btn-admin btn-admin-emerald" id="db-export-btn">
+                  <i class="fa-solid fa-download"></i> Export Database (.json)
+                </button>
+                <label class="btn-admin btn-admin-secondary" style="margin: 0; cursor: pointer;">
+                  <i class="fa-solid fa-upload"></i> Import JSON
+                  <input type="file" id="db-import-file" accept=".json" style="display: none;">
+                </label>
+                <button class="btn-admin btn-admin-danger" id="db-reset-btn">
+                  <i class="fa-solid fa-rotate-left"></i> Reset to Factory Default
+                </button>
+              </div>
+            </div>
+
+            <!-- Database Table Switcher Tabs -->
+            <div class="db-table-tabs">
+              <button class="db-tab-btn active" data-dbtable="projects"><i class="fa-solid fa-layer-group"></i> projects</button>
+              <button class="db-tab-btn" data-dbtable="experience"><i class="fa-solid fa-briefcase"></i> experience</button>
+              <button class="db-tab-btn" data-dbtable="certifications"><i class="fa-solid fa-award"></i> certifications</button>
+              <button class="db-tab-btn" data-dbtable="education"><i class="fa-solid fa-graduation-cap"></i> education</button>
+              <button class="db-tab-btn" data-dbtable="research"><i class="fa-solid fa-book-journal-whills"></i> research</button>
+              <button class="db-tab-btn" data-dbtable="skills"><i class="fa-solid fa-code"></i> skills</button>
+              <button class="db-tab-btn" data-dbtable="profile"><i class="fa-solid fa-user"></i> profile</button>
+              <button class="db-tab-btn" data-dbtable="messages"><i class="fa-solid fa-inbox"></i> messages</button>
+              <button class="db-tab-btn" data-dbtable="raw_json" style="margin-left: auto; border-color: var(--border-gold); color: var(--gold-light);">
+                <i class="fa-solid fa-code-merge"></i> Raw JSON Schema
+              </button>
+            </div>
+
+            <!-- Visual Table Container -->
+            <div id="db-table-view-section">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span style="font-size: 0.85rem; color: var(--text-dim);">Selected Collection:</span>
+                  <span class="cell-badge" style="background: rgba(56,189,248,0.15); color: var(--cyan-light);" id="current-dbtable-badge">projects</span>
+                  <span style="font-size: 0.8rem; color: var(--text-dim);" id="current-dbtable-count">(4 records)</span>
+                </div>
+
+                <div style="display: flex; gap: 0.6rem;">
+                  <input type="text" id="db-search-input" class="form-input" placeholder="Search in table..." style="padding: 0.4rem 0.8rem; width: 220px; font-size: 0.82rem;">
+                  <button class="btn-admin btn-admin-primary btn-sm" id="db-add-record-btn">
+                    <i class="fa-solid fa-plus"></i> Insert Record
+                  </button>
+                </div>
+              </div>
+
+              <div class="data-table-container">
+                <table class="admin-data-table" id="visual-db-table">
+                  <thead>
+                    <!-- Rendered dynamically -->
+                  </thead>
+                  <tbody>
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Raw JSON Schema Section -->
+            <div id="db-raw-json-section" style="display: none;">
+              <div class="json-editor-wrap">
+                <div class="json-editor-toolbar">
+                  <div style="font-size: 0.82rem; font-family: var(--font-code); color: var(--gold-light);">
+                    <i class="fa-solid fa-file-code"></i> full_database_schema.json
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn-admin btn-admin-secondary btn-sm" id="json-format-btn">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Format JSON
+                    </button>
+                    <button class="btn-admin btn-admin-primary btn-sm" id="json-save-btn">
+                      <i class="fa-solid fa-floppy-disk"></i> Validate & Commit to DB
+                    </button>
+                  </div>
+                </div>
+                <textarea id="raw-json-textarea" class="json-textarea" spellcheck="false"></textarea>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 3: PROFILE & HERO SECTION EDITOR
+             ================================================================== -->
+        <section class="admin-view" id="view-profile">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-user-astronaut"></i> Hero & Profile Content Configuration
+              </div>
+              <button class="btn-admin btn-admin-primary" id="save-profile-btn">
+                <i class="fa-solid fa-check"></i> Save Profile Updates
+              </button>
+            </div>
+
+            <form id="profile-editor-form">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" id="prof-fullName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tagline / Primary Role</label>
+                  <input type="text" id="prof-tagline" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Availability Status Badge</label>
+                  <input type="text" id="prof-availabilityStatus" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Avatar Image Path / URL</label>
+                  <input type="text" id="prof-avatar" class="form-input" required>
+                  <span class="form-hint">Default: <code>assets/images/avatar.jpg</code></span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Resume PDF Path / URL</label>
+                  <input type="text" id="prof-resumePdf" class="form-input" required>
+                  <span class="form-hint">Default: <code>assets/docs/Piyush_Kumar_Resume.pdf</code></span>
+                </div>
+              </div>
+
+              <!-- Contact Information -->
+              <h4 style="font-size: 1rem; color: var(--gold-light); margin: 1.5rem 0 0.8rem 0; border-top: 1px solid var(--border-admin); padding-top: 1.2rem;">
+                <i class="fa-solid fa-address-book" style="margin-right: 6px;"></i> Direct Contact & Social Links
+              </h4>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" id="prof-email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone / WhatsApp</label>
+                  <input type="text" id="prof-phone" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Location</label>
+                  <input type="text" id="prof-location" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">LinkedIn Profile URL</label>
+                  <input type="url" id="prof-linkedin" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">GitHub Profile URL</label>
+                  <input type="url" id="prof-github" class="form-input">
+                </div>
+              </div>
+
+              <!-- Metric Counters -->
+              <h4 style="font-size: 1rem; color: var(--cyan-light); margin: 1.5rem 0 0.8rem 0; border-top: 1px solid var(--border-admin); padding-top: 1.2rem;">
+                <i class="fa-solid fa-gauge-high" style="margin-right: 6px;"></i> Hero Metric Counter Numbers
+              </h4>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Key Systems Built</label>
+                  <input type="text" id="metric-keySystems" class="form-input" placeholder="e.g. 4+">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Internships Completed</label>
+                  <input type="text" id="metric-internships" class="form-input" placeholder="e.g. 2">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Accredited Certifications</label>
+                  <input type="text" id="metric-certifications" class="form-input" placeholder="e.g. 7">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Research Papers</label>
+                  <input type="text" id="metric-researchPapers" class="form-input" placeholder="e.g. 1">
+                </div>
+              </div>
+
+              <!-- Bio & Hero Descriptions -->
+              <h4 style="font-size: 1rem; color: var(--emerald-light); margin: 1.5rem 0 0.8rem 0; border-top: 1px solid var(--border-admin); padding-top: 1.2rem;">
+                <i class="fa-solid fa-paragraph" style="margin-right: 6px;"></i> Biography & Narratives
+              </h4>
+              <div class="form-group">
+                <label class="form-label">Hero Banner Paragraph Description</label>
+                <textarea id="prof-heroDescription" class="form-textarea" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">About Executive Overview Story (HTML Allowed)</label>
+                <textarea id="prof-bio" class="form-textarea" rows="4"></textarea>
+              </div>
+
+              <!-- Typewriter Roles -->
+              <div class="form-group">
+                <label class="form-label">Hero Typewriter Roles (One per line)</label>
+                <textarea id="prof-roles" class="form-textarea" rows="4" placeholder="Enter roles separated by line"></textarea>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 4: EXPERIENCE MANAGER
+             ================================================================== -->
+        <section class="admin-view" id="view-experience">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-briefcase"></i> Work Experience & Internships
+              </div>
+              <button class="btn-admin btn-admin-primary" id="add-exp-modal-btn">
+                <i class="fa-solid fa-plus"></i> Add New Experience
+              </button>
+            </div>
+
+            <div id="experience-cards-container" class="form-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 5: PROJECTS & SIMULATORS MANAGER
+             ================================================================== -->
+        <section class="admin-view" id="view-projects">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-layer-group"></i> Showcase Projects & Interactive Simulators
+              </div>
+              <button class="btn-admin btn-admin-primary" id="add-proj-modal-btn">
+                <i class="fa-solid fa-plus"></i> Add New Project
+              </button>
+            </div>
+
+            <div id="projects-admin-grid" class="form-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 6: RESEARCH & PAPERS MANAGER
+             ================================================================== -->
+        <section class="admin-view" id="view-research">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-book-journal-whills"></i> Research & Scientific Publications
+              </div>
+              <button class="btn-admin btn-admin-primary" id="save-research-btn">
+                <i class="fa-solid fa-check"></i> Save Research Updates
+              </button>
+            </div>
+
+            <form id="research-editor-form">
+              <div class="form-group">
+                <label class="form-label">Research Paper Title</label>
+                <input type="text" id="res-title" class="form-input" required>
+              </div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Authors</label>
+                  <input type="text" id="res-authors" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Research Field / Domain</label>
+                  <input type="text" id="res-field" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Status</label>
+                  <input type="text" id="res-status" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">DOI / Citation Code</label>
+                  <input type="text" id="res-doi" class="form-input">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Executive Abstract</label>
+                <textarea id="res-abstract" class="form-textarea" rows="4"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Key Research Highlights (One bullet per line)</label>
+                <textarea id="res-highlights" class="form-textarea" rows="4"></textarea>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 7: CERTIFICATIONS MANAGER
+             ================================================================== -->
+        <section class="admin-view" id="view-certifications">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-award"></i> Accredited Certifications & Credentials
+              </div>
+              <button class="btn-admin btn-admin-primary" id="add-cert-modal-btn">
+                <i class="fa-solid fa-plus"></i> Add Certification
+              </button>
+            </div>
+
+            <div id="certs-admin-grid" class="form-grid">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 8: SKILLS MATRIX MANAGER
+             ================================================================== -->
+        <section class="admin-view" id="view-skills">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-code"></i> Technical & Engineering Skills Matrix
+              </div>
+              <button class="btn-admin btn-admin-primary" id="save-skills-btn">
+                <i class="fa-solid fa-check"></i> Save Skills Changes
+              </button>
+            </div>
+
+            <div id="skills-editor-wrapper">
+              <!-- Rendered dynamically with sliders & icons -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 9: INBOX & INQUIRIES
+             ================================================================== -->
+        <section class="admin-view" id="view-messages">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div>
+                <div class="card-title-heading">
+                  <i class="fa-solid fa-inbox"></i> Client Inquiries & Contact Transmissions
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+                  All form submissions from your live portfolio are stored here in real-time.
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 0.6rem;">
+                <button class="btn-admin btn-admin-secondary btn-sm" id="inbox-mark-all-read">
+                  <i class="fa-solid fa-check-double"></i> Mark All as Read
+                </button>
+                <button class="btn-admin btn-admin-danger btn-sm" id="inbox-clear-all">
+                  <i class="fa-solid fa-trash-can"></i> Clear Inbox
+                </button>
+              </div>
+            </div>
+
+            <div class="data-table-container">
+              <table class="admin-data-table" id="inbox-data-table">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Sender Name</th>
+                    <th>Email Address</th>
+                    <th>Subject</th>
+                    <th>Received Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 10: SETTINGS & SECURITY
+             ================================================================== -->
+        <section class="admin-view" id="view-settings">
+          <div class="admin-card">
+            <div class="card-title-bar">
+              <div class="card-title-heading">
+                <i class="fa-solid fa-shield-keyhole"></i> Security & Admin Passcode
+              </div>
+            </div>
+
+            <form id="change-passcode-form" style="max-width: 500px;">
+              <div class="form-group">
+                <label class="form-label">Current Admin Passcode</label>
+                <input type="password" id="curr-passcode" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">New Passcode</label>
+                <input type="password" id="new-passcode" class="form-input" required minlength="4">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Confirm New Passcode</label>
+                <input type="password" id="confirm-passcode" class="form-input" required minlength="4">
+              </div>
+              <button type="submit" class="btn-admin btn-admin-primary" style="margin-top: 0.5rem;">
+                <i class="fa-solid fa-key"></i> Update Passcode
+              </button>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       ADMIN CRUD MODAL (Dynamic Row / Record Form)
+       ========================================================================== -->
+  <div class="admin-modal-backdrop" id="admin-crud-modal">
+    <div class="admin-modal-box">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="crud-modal-title">Edit Record</h3>
+        <button class="btn-icon-admin" id="close-crud-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="crud-modal-body">
+        <!-- Injected dynamically based on schema -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Detail Modal -->
+  <div class="admin-modal-backdrop" id="admin-msg-modal">
+    <div class="admin-modal-box" style="max-width: 550px;">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title"><i class="fa-solid fa-envelope-open"></i> Transmission Details</h3>
+        <button class="btn-icon-admin" id="close-msg-modal-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="msg-modal-content" style="font-size: 0.9rem; line-height: 1.7; color: var(--text-main);">
+        <!-- Injected dynamically -->
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.5rem; border-top: 1px solid var(--border-admin); padding-top: 1rem;">
+        <a id="msg-reply-link" href="#" class="btn-admin btn-admin-primary">
+          <i class="fa-solid fa-reply"></i> Reply via Email
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Toast Container -->
+  <div class="admin-toast-container" id="admin-toasts"></div>
+
+  <!-- Database & Admin Engine Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
